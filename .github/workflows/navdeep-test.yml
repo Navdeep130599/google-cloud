@@ -16,11 +16,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '16' 
+          node-version: '14' 
 
       - name: Install dependencies
         run: npm install
 
       - name: Run E2E tests
-        run: npm run e2e  
+        run: run e2e  
 
