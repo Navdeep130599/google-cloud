@@ -40,3 +40,5 @@ Feature: Spanner source - Verification of Spanner to Spanner successful data tra
     Then Wait till pipeline is in running state
     Then Verify the pipeline status is "Succeeded"
     Then Validate records transferred to target spanner table with record counts of source spanner table
+
+

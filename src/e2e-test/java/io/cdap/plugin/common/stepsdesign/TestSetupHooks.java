@@ -70,6 +70,10 @@ public class TestSetupHooks {
   public static boolean firstSpannerTestFlag = true;
   public static String datasetName = PluginPropertyUtils.pluginProp("dataset");
 
+  public static String spannerExistingTargetTable = StringUtils.EMPTY;
+
+
+
   @Before(order = 1)
   public static void overrideServiceAccountFilePathIfProvided() {
     if (beforeAllFlag) {
@@ -622,12 +626,65 @@ public class TestSetupHooks {
     spannerTargetTable = StringUtils.EMPTY;
   }
 
+
+  //SinkTableExistsHook - Navdeep
+
+  @Before(order = 2, value = "@EXISTING_SPANNER_SINK")
+  public static void makeExistingTargetSpannerDBAndTableName() {
+    try {
+
+      spannerDatabase=spannerDatabase;
+
+      //Create Spanner Table in existing DB with empty table
+      spannerExistingTargetTable = PluginPropertyUtils.pluginProp("spannerExistingTargetTable");
+      String createQuery = null,insertQuery=null;
+      try {
+        createQuery = new String(Files.readAllBytes(Paths.get(TestSetupHooks.class.getResource
+                ("/" + PluginPropertyUtils.pluginProp("spannerTestDataCreateExistingSinkTableQueriesFile")).toURI()))
+                , StandardCharsets.UTF_8);
+//        insertQuery=new String(Files.readAllBytes(Paths.get(TestSetupHooks.class.getResource
+//                ("/" + PluginPropertyUtils.pluginProp("spannerTestDataInsertDataIntoExistingSinkTableQueriesFile")).toURI()))
+//                , StandardCharsets.UTF_8);
+
+      } catch (Exception e) {
+        BeforeActions.scenario.write("Exception in reading "
+                + PluginPropertyUtils.pluginProp("spannerTestDataCreateExistingSinkTableQueriesFile")
+                + " - " + e.getMessage());
+        Assert.fail("Exception in Spanner testdata prerequisite setup - error in reading create EXISTING table queries file "
+                + e.getMessage());
+      }
+
+      SpannerClient.executeDMLQuery(spannerInstance, spannerDatabase, createQuery);
+      //SpannerClient.executeDMLQuery(spannerInstance, spannerDatabase, insertQuery);
+
+      PluginPropertyUtils.addPluginProp("spannerDatabase", spannerDatabase);
+      PluginPropertyUtils.addPluginProp("spannerExistingTargetTable", spannerExistingTargetTable);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+  }
+
+  @After(order = 2, value = "@EXISTING_SPANNER_SINK")
+  public static void emptyExistingTargetSpannerDBAndTableName() {
+
+   // PluginPropertyUtils.removePluginProp("spannerInstance"); ?
+    PluginPropertyUtils.removePluginProp("spannerDatabase");
+    PluginPropertyUtils.removePluginProp("spannerExistingTargetTable");
+    spannerDatabase = StringUtils.EMPTY;
+    spannerExistingTargetTable = StringUtils.EMPTY;
+  }
+
+
+
+
   @Before(order = 2, value = "@SPANNER_SINK_NEWDB_TEST")
   public static void setTempTargetSpannerNewDBAndTableName() {
-    spannerTargetDatabase = "e2e-target-db-" + UUID.randomUUID().toString().substring(0, 10);
-    spannerTargetTable = "e2e_target_table_" + UUID.randomUUID().toString().substring(0, 10).replaceAll("-", "_");
-    PluginPropertyUtils.addPluginProp("spannerTargetDatabase", spannerTargetDatabase);
-    PluginPropertyUtils.addPluginProp("spannerTargetTable", spannerTargetTable);
+//    spannerTargetDatabase = "e2e-target-db-" + UUID.randomUUID().toString().substring(0, 10);
+//    spannerTargetTable = "e2e_target_table_" + UUID.randomUUID().toString().substring(0, 10).replaceAll("-", "_");
+//    PluginPropertyUtils.addPluginProp("spannerTargetDatabase", spannerTargetDatabase);
+//    PluginPropertyUtils.addPluginProp("spannerTargetTable", spannerTargetTable);
     BeforeActions.scenario.write("Spanner Target db name - " + spannerTargetDatabase);
     BeforeActions.scenario.write("Spanner Target table name - " + spannerTargetTable);
   }

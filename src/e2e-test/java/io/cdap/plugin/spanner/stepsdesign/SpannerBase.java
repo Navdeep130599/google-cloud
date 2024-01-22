@@ -15,6 +15,7 @@
  */
 package io.cdap.plugin.spanner.stepsdesign;
 
+import io.cdap.cdap.api.plugin.PluginProperties;
 import io.cdap.e2e.utils.BigQueryClient;
 import io.cdap.e2e.utils.CdfHelper;
 import io.cdap.e2e.utils.ElementHelper;
@@ -26,6 +27,8 @@ import io.cdap.plugin.utils.SpannerClient;
 import io.cucumber.java.en.Then;
 import org.junit.Assert;
 import stepsdesign.BeforeActions;
+import io.cdap.plugin.utils.E2EHelper;
+
 
 import java.io.IOException;
 import java.util.Optional;
@@ -33,7 +36,7 @@ import java.util.Optional;
 /**
  * Spanner plugin related common test step definitions.
  */
-public class SpannerBase implements CdfHelper {
+public class SpannerBase implements CdfHelper,E2EHelper {
 
   @Then("Enter Spanner property reference name")
   public void enterSpannerPropertyReferenceName() {
@@ -139,17 +142,43 @@ public class SpannerBase implements CdfHelper {
   @Then("Validate records transferred to target spanner table with record counts of source spanner table")
   public void validateRecordsTransferredToTargetSpannerTableWithRecordCountsOfSourceSpannerTable() {
     int spannerSourceTableRecordCount = SpannerClient
-      .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
-                                PluginPropertyUtils.pluginProp("spannerDatabase"),
-                                PluginPropertyUtils.pluginProp("spannerSourceTable"));
+            .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
+                    PluginPropertyUtils.pluginProp("spannerDatabase"),
+                    PluginPropertyUtils.pluginProp("spannerSourceTable"));
     BeforeActions.scenario.write("No of records from Spanner Source table :" + spannerSourceTableRecordCount);
     int spannerTargetTableRecordCount = SpannerClient
-      .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
-                                PluginPropertyUtils.pluginProp("spannerTargetDatabase"),
-                                PluginPropertyUtils.pluginProp("spannerTargetTable"));
+            .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
+                    PluginPropertyUtils.pluginProp("spannerTargetDatabase"),
+                    PluginPropertyUtils.pluginProp("spannerTargetTable"));
     BeforeActions.scenario.write("No of records transferred to Spanner target table:"
-                                   + spannerTargetTableRecordCount);
+            + spannerTargetTableRecordCount);
 
     Assert.assertEquals(spannerSourceTableRecordCount, spannerTargetTableRecordCount);
+
+  }
+
+
+  @Then("Validate records transferred to target spanner table with record counts of existing source spanner table")
+  public void validateRecordsTransferredToExistingSpannerTableWithRecordCountsOfSourceSpannerTable() {
+    int spannerSourceTableRecordCount = SpannerClient
+            .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
+                    PluginPropertyUtils.pluginProp("spannerDatabase"),
+                    PluginPropertyUtils.pluginProp("spannerSourceTable"));
+    BeforeActions.scenario.write("No of records from Spanner Source table :" + spannerSourceTableRecordCount);
+    int spannerTargetTableRecordCount = SpannerClient
+            .getCountOfRecordsInTable(PluginPropertyUtils.pluginProp("spannerInstance"),
+                    PluginPropertyUtils.pluginProp("spannerDatabase"),
+                    PluginPropertyUtils.pluginProp("spannerExistingTargetTable"));
+    BeforeActions.scenario.write("No of records transferred to Existing Spanner target table:"
+            + spannerTargetTableRecordCount);
+
+    Assert.assertEquals(spannerSourceTableRecordCount, spannerTargetTableRecordCount);
+  }
+
+
+
+  @Then("Enter Spanner property {string} as macro argument {string}")
+  public void enterSpannerPropertyAsMacroArgument(String pluginProperty, String macroArgument) {
+    enterPropertyAsMacroArgument(pluginProperty, macroArgument);
   }
 }

@@ -178,6 +178,7 @@ public class BigQueryBase implements E2EHelper {
   @Then("Enter BigQuery property {string} as macro argument {string}")
   public void enterBigQueryPropertyAsMacroArgument(String pluginProperty, String macroArgument) {
     enterPropertyAsMacroArgument(pluginProperty, macroArgument);
+
   }
 
   @Then("Enter BigQuery cmek property {string} as macro argument {string} if cmek is enabled")
