@@ -22,7 +22,7 @@ import io.cdap.plugin.spanner.locators.SpannerLocators;
 import java.util.UUID;
 
 /**
- * Spanner Plugin related step actions.
+ * Spanner Plugin related step actions...
  */
 public class SpannerActions {
   static {
