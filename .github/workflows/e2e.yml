@@ -24,7 +24,7 @@ on:
 
 jobs:
   build:
-    runs-on: k8s-runner-e2e
+    runs-on: self-hosted
     # We allow builds:
     # 1) When triggered manually
     # 2) When it's a merge into a branch
