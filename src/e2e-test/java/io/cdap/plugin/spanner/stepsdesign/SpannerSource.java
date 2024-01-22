@@ -32,6 +32,7 @@ public class SpannerSource implements CdfHelper {
     selectSourcePlugin("Spanner");
   }
 
+
   @Then("Open Spanner source properties")
   public void openSpannerSourceProperties() {
     openSourcePluginProperties("Spanner");
